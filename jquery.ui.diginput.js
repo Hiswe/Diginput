@@ -3,8 +3,8 @@
 	$.widget("ui.diginput",{
 		_init: function(){
 		        o = this.options,
-				$button = null,
-				this.options.separator = checkSeparator(o.separator);
+				$button = null ;
+				o.separator = checkSeparator(o.separator);
 				if (!o.val){
 					this.element.val('');
 				}							
@@ -30,12 +30,22 @@
 					if(!this._validKey(event)){
 						event.preventDefault();
 					}
-				}, this));				
+				}, this)).bind('change', $.proxy(function(event){
+                    this.element.trigger('change');
+                    (o.debug) ? console.info('[Event] Change | original Input') : null;
+                },this));
 			// add x1000 button
 			if (o.x1000Button != ''){
 				$button = $(o.x1000Button);
 				this.$copy.after($button);
-				$button.bind('click.'+o.bindNameSpace,$.proxy(function(event){this._x1000(event)}, this));
+				$button.bind('click.'+o.bindNameSpace,$.proxy(
+                        function(event)
+                        {
+                            this._x1000(event);
+                            this.element.trigger('change');
+                            (o.debug) ? console.info('[Event] Change | original Input') : null;
+                        }, this)
+                       );
 			}				
 		},
 		_makeCopy: function(){ // copy the input and hide the original
@@ -50,13 +60,13 @@
 				$label.attr('for', newId);
 			}
 			// mask the previous label
-			this.element.hide();
+			(o.debug) ? this.element.fadeTo('normal', 0.5) : this.element.hide();
 			return $copy;
 		},
 		_x1000: function(event){
 			event.preventDefault();
 			event.stopPropagation();
-			rawData = this.element.val();
+			var rawData = this.element.val();
 			if (!rawData){
 				rawData = 1;
 			}
@@ -68,7 +78,7 @@
 		},
 		_updateInput: function(newData){ // Update the inputs
 				this.$copy.val(newData.string);
-				this.element.val(newData.number).trigger('change');		
+			    this.element.val(newData.number);
 		},
 		_validKey: function(event){  // Check if a key is valid
 			var separator= this.options.separator;
@@ -119,7 +129,7 @@
 			switch(key){
 				case "val":
 					if (value) {
-						this._updateInput(this.format(value, this.options.separator, false));
+						this._updateInput($.ui.diginput.format(value, this.options.separator, false));
 					} 
 				break;
 			}
@@ -133,8 +143,9 @@
 			val: false,
 			separator: 'fr',
 			x1000Button : '<a href="#" class="bouton boutonPetit"><span>x1000</span></a>',
-			onComplete : $.noop
-		}		 
+			onComplete : $.noop,
+			debug : false
+		}
 	});
 	/* Integer format with thousand separator */
 	function formatInteger(integer, thousandSeparator){
