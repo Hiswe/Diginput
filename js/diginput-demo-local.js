@@ -1,10 +1,8 @@
 $(function(){
-	$.ui.diginput.format(1000);
-//    alert($.datepicker.iso8601Week( new Date(2007, 1 - 1, 26)));
+//	$.ui.diginput.format(1000);
+    var $input = $('input.notionnel'); 
 	$('#change').hide();
-	$('input.notionnel').diginput().bind('change', function(){
-		$('#change').show().fadeOut('fast');
-	});
+	$input.diginput();
 	/* Buttons */
 	$('#submit').click(function(event){
 		$('#display span')
@@ -16,22 +14,22 @@ $(function(){
 	});
 	$('#disable').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);
-		$('input.notionnel').diginput('disable');
+		$input.diginput("disable");
 	});	
 	$('#enable').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);											   
-		$('input.notionnel').diginput('enable');
+		$input.diginput('enable');
 	});
 	$('#destroy').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);												
-		$('input.notionnel').diginput('destroy');
+		$input.diginput('destroy');
 	});
 	$('#make').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);											 
-		$('input.notionnel').diginput();
+		$input.diginput();
 	});	
 	$('#setValue').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);												 
-		$('input.notionnel').diginput('option' ,'val', 123456789);
+		$input.diginput('option' ,'val', 123456789);
 	});
 });
