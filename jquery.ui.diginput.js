@@ -1,13 +1,31 @@
-// Plugin de formatage de nombre ©Hiswe
-(function($){
+/*
+ * jQuery UI Diginput @VERSION
+ *
+ * Copyright 2010, ©Hiswe
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * Depends:
+ *	jquery.ui.core.js
+ *	jquery.ui.widget.js
+ */
+(function($, undefined){
 	$.widget("ui.diginput",{
-		_init: function(){
-		        o = this.options,
-				$button = null ;
+		options: {
+			bindNameSpace : 'diginput',
+    		idSuffix: '-copy',
+			classInput: 'diginput',
+			disabledClass: 'disabled',
+			val: false,
+			separator: 'fr',
+			x1000Button : '<a href="#" class="bouton boutonPetit"><span>x1000</span></a>',
+			onComplete : $.noop,
+			debug : false
+		},
+		_create: function(){
+		        var o = this.options;
+				var $button = null ;
 				o.separator = checkSeparator(o.separator);
-				if (!o.val){
-					this.element.val('');
-				}							
 				this.$copy = this._makeCopy();
 				var presentationData = this.element.val();
 								
@@ -17,9 +35,7 @@
 					var timeOut = setTimeout(function(){																			  
 						// don't update if the values remain the same							  
 						var newData = self.$copy.val();							
-						if (presentationData == newData){							
-							return;
-						}else{
+						if (presentationData != newData){
 							presentationData = newData;
 							self._updateInput(this.format(newData, self.options.separator, false));
 						}		
@@ -36,9 +52,9 @@
                 },this));
 			// add x1000 button
 			if (o.x1000Button != ''){
-				$button = $(o.x1000Button);
-				this.$copy.after($button);
-				$button.bind('click.'+o.bindNameSpace,$.proxy(
+				this.$button = $(o.x1000Button);
+				this.$copy.after(this.$button);
+				this.$button.bind('click.'+o.bindNameSpace,$.proxy(
                         function(event)
                         {
                             this._x1000(event);
@@ -50,9 +66,11 @@
 		},
 		_makeCopy: function(){ // copy the input and hide the original
 			var $copy = this.element.clone();
-			var newId = this.element.attr('id')+this.options.idSuffix;
+            var newId = this.element.attr('id')+this.options.idSuffix;
+            
 			$copy.addClass(this.options.classInput)
 				.attr('id', newId)
+                .val($.ui.diginput.format($copy.val(), this.options.separator, false).string)
 				.insertBefore(this.element);
 			// Change the label	
 			var $label = $('label[for='+this.element.attr('id')+']');
@@ -60,7 +78,7 @@
 				$label.attr('for', newId);
 			}
 			// mask the previous label
-			(o.debug) ? this.element.fadeTo('normal', 0.5) : this.element.hide();
+			(this.options.debug) ? this.element.fadeTo('normal', 0.5) : this.element.hide();
 			return $copy;
 		},
 		_x1000: function(event){
@@ -103,23 +121,23 @@
 		destroy: function(){
 			this.element.fadeTo('slow', 1);
 			this.$copy.fadeOut('fast',function(){$(this).remove()});
-			if (o.x1000Button != ''){
-				$button.fadeOut('fast',function(){$(this).remove()});
+			if (this.options.x1000Button != ''){
+				this.$button.fadeOut('fast',function(){$(this).remove()});
 			}
 			$.Widget.prototype.destroy.call( this );
 		},
 		disable: function(){
-			var o = this.options;
+            var o = this.options;
 			this.$copy.attr('disabled','disabeld').fadeTo('normal',0.85, function(){$(this).addClass(o.disabledClass)});
-			if($button){
-				$button.addClass(o.disabledClass).unbind('click.'+o.bindNameSpace).fadeTo('normal',0.5);
+			if(this.$button){
+				this.$button.addClass(o.disabledClass).unbind('click.'+o.bindNameSpace).fadeTo('normal',0.5);
 			}
 		},
 		enable: function(){
-			var o = this.options;
+            var o = this.options;
 			this.$copy.removeClass(o.disabledClass).attr('disabled','').fadeTo('normal',1);
-			if($button){
-				$button.removeClass(o.disabledClass)
+			if(this.$button){
+				this.$button.removeClass(o.disabledClass)
 				.bind('click.'+o.bindNameSpace,$.proxy(function(event){this._x1000(event)}, this))
 				.fadeTo('normal',1);
 			}
@@ -134,17 +152,6 @@
 				break;
 			}
 			
-		},
-		options: {
-			bindNameSpace : 'diginput',
-    		idSuffix: '-copy',
-			classInput: 'diginput',
-			disabledClass: 'disabled',
-			val: false,
-			separator: 'fr',
-			x1000Button : '<a href="#" class="bouton boutonPetit"><span>x1000</span></a>',
-			onComplete : $.noop,
-			debug : false
 		}
 	});
 	/* Integer format with thousand separator */

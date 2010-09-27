@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+    <title>Diginput widget - documentation</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/separateur.css"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+//            $('#content').tabs();
+            $('dd').hide();
+            $('dt').bind('click', function(){
+               $(this).next().toggle();
+            });
+        });
+    </script>
+</head>
+<body id="doc">
+<div id="main">
+    <ul id="lesson">
+        <li>Diginput widget</li>
+    </ul>
+    <div id="content">
+        <ul id="menu">
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#options">Options</a></li>
+            <li><a href="#methods">Méthodes</a></li>
+        </ul>
+        <div id="overview">
+            <p>
+                Reformate automatiquement les inputs pour une meilleure lisibilité :<br />
+                10000000 s'affichera 10 000 000
+            </p>
+            <ul>
+                <li>Création d'un copie de l'input originale servant uniquement à l'affichage</li>
+                <li>Les données sont copiées dans l'input caché sans le formatage</li>
+                <li>L'input d'affichage n'autorise pas les caractères autres que numérique, séparateurs de décimale & séparater de milliers</li>
+                <li>L'évènement change de l'input d'affichage est répercuté sur l'input de base</li>
+            </ul>
+            <p>
+                <strong>Utility functions</strong>
+            </p>
+            <p>
+                $.ui.diginput.format('value','separator');
+            </p>
+            <p>
+               separator : peut être soit un string soit un objet -> voir l'option separator pour plus de détails;<br>
+               Si les paramètres de séparations ne sont pas complets, le widget les completera avec ceux par défaut.
+            </p>
+            <p>
+                retourne un hasch se présentant ainsi :
+            </p>
+<pre>
+{
+    number : le nombre en float,
+    string : le nombre formaté en string
+}
+</pre>
+        </div>
+        <div id="options">
+            <dl>
+                <dt><strong>bindNameSpace</strong> <span class="type">string</span><span class="default">diginput</span>
+                </dt>
+                <dd>
+                    <p>namespace associé à tout les évènements générés par le widget</p>
+                </dd>
+                <dt><strong>idSuffix</strong> <span class="type">string</span><span class="default">-copy</span></dt>
+                <dd>
+                    <p>Suffix ajouté à l'id du champ cloné ( $('#foo').diginput(); génèrera un champ nommé '#foo-copy')
+                </p>
+                </dd>
+                <dt><strong>classInput</strong> <span class="type">string</span><span class="default">diginput</span>
+                </dt>
+                <dd>
+                    <p>Class ajoutée au au champ cloné</p>
+                </dd>
+                <dt><strong>disabledClass</strong> <span class="type">string</span><span class="default">disabled</span>
+                </dt>
+                <dd>
+                    <p>Class ajoutée au au champ cloné à l'appel de la méthode 'disable'</p>
+                </dd>
+                <dt><strong>val</strong> <span class="type">boolean</span><span class="default">false</span></dt>
+                <dd>
+                    <p>Á virer du code. utiliser la fonction .val() de jQuery à la place.</p>
+                    <p>Faire une méthode pour setter la valeur</p>
+                </dd>
+                <dt>
+                    <strong>separator</strong> <span class="type">string || object</span><span class="default">fr</span>
+                </dt>
+                <dd>
+                    Permet de définir les caractères de séparations.
+                    l'objet prends a 3 propriétés :
+                    <ul>
+                        <li><b>floatSep</b> : sépare l'entier de ses décimales</li>
+                        <li>
+                            <b>floatFix</b> : Caractère alternatif au floatSep. Sera automatiquement remplacé par ce
+                            dernier
+                        </li>
+                        <li><b>spacing</b> : le caractère de séparation entre les milliers</li>
+                    </ul>
+                    <p>Il y a aussi certains set de prédéfini. Dans ce cas là on passe le nom du set</p>
+<pre>
+    fr: {
+        floatSep: '.',
+        floatFix: ',',
+        spacing: ' '
+    }
+    en: {
+        floatSep: ',',
+        floatFix: '',
+        spacing: '.'
+    }
+    int: {
+        floatSep: '',
+        floatFix: '',
+        spacing: ' '
+    }
+    float: {
+        floatSep: '.',
+        floatFix: '',
+        spacing: ' '
+    }
+</pre>
+
+                </dd>
+                <dt><strong>x1000Button</strong> <span class="type">string</span><code class="default">
+                    &lt;a href="#" class="bouton boutonPetit"&gt;&lt;span&gt;x1000&gt;/span&gt;&lt;/a&gt;
+                </code></dt>
+                <dd>
+                    <p>Code html inséré pour le bouton x1000</p>
+                    <p>'' == pas de bouton</p>
+                </dd>
+                <dt><strong>onComplete</strong> <span class="type">function</span><span class="default">$.noop</span>
+                </dt>
+                <dd><p>Ne fonctionne pas encore</p></dd>
+                <dt><strong>debug</strong> <span class="type">boolean</span><span class="default">false</span></dt>
+                <dd><p>Ajout de message de débug. Nécessite une console ouverte</p></dd>
+            </dl>
+        </div>
+        <div id="methods">
+            <dl>
+                <dt>
+                    <strong>destroy</strong>
+                    <code>.diginput("destroy")</code>
+                </dt>
+                <dd>
+                    <p>Remove the Diginput functionality completely. This will return the element back to its pre-init
+                        state</p>
+                </dd>
+                <dt>
+                    <strong>disable</strong>
+                    <code>.diginput("destroy")</code></dt>
+                <dd>
+                    <p>Disable the Diginput (input &amp; x1000 button).</p>
+                </dd>
+                <dt>
+                    <strong>enable</strong>
+                    <code>.diginput("destroy")</code>
+                </dt>
+                <dd>
+                    <p>Enable the Diginput.</p>
+                </dd>
+                <dt>
+                    <strong>options</strong>
+                    <code>.diginput("options", "val", [value])</code>
+                </dt>
+                <dd>
+                    <p>set the val of the input</p>
+                    <p>should be a setter function</p>
+                </dd>
+            </dl>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

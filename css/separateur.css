@@ -1,3 +1,64 @@
+/****************
+    reset css
+****************/
+/* http://meyerweb.com/eric/tools/css/reset/ */
+/* v1.0 | 20080212 */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/****************
+    global css
+****************/
+
 *{
 	font-family: Helvetica, sans-serif;
 }
@@ -20,9 +81,13 @@ body{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#AAAAAA')"; /* IE8 */
 	min-height:100%;	
 }
+#doc{
+	background:	#85004b;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(230,57,155,1)), to(rgba(133,0,75,1)));
+	background: -moz-linear-gradient(rgba(230,57,155,1),rgba(133,0,75,1));	    
+}
 #main{
 	padding:1em 3em 3em;
-	text-align:center;
 }
 #formContent{
 	width:85%;
@@ -81,7 +146,7 @@ form::after{
 .secondaryAction::after{
 	opacity: 0.07;
 }
-em{
+label em{
 	font-size:2em;
 	font-weight:bold;
 	font-style:normal;
@@ -255,4 +320,76 @@ button:active{
 }
 #display span{
 	color:rgba(0,0,0,0.6);
+}
+
+/* Documentation */
+#doc #lesson :first-child{
+    color: #FFF;
+}
+#content{
+    background:#FFF;
+	background:  -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#AAAAAA));
+	background:  -moz-linear-gradient(top, #FFFFFF,#AAAAAA);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#AAAAAA'); /* IE6,IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#AAAAAA')"; /* IE8 */
+    padding: 2% 5%;
+    border-radius:15px;
+    -moz-border-radius:15px;
+    -webkit-border-radius:15px;
+}
+dt{
+    background:rgba(0,0,0,0.05);
+    border: solid rgba(0,0,0,0.1);
+    border-width:1px 0 0;
+    padding:0.5em 1em;
+    cursor:pointer;
+}
+dd{
+    padding: 1em;
+    background:rgba(0,0,0,0.05);
+	background:  -moz-linear-gradient(top, rgba(0,0,0,0.05),rgba(0,0,0,0));
+}
+dt span,
+dt strong{
+    width : 20%;
+    display:inline-block;
+}
+.type{
+    width:10%;
+    font-style:italic;
+}
+.default::before{
+    content: 'default(';
+}
+.default::after{
+    content: ')';
+}
+.default::before,
+.default::after{
+    color:rgba(0,0,0,0.35);
+}
+#content > div::before{
+    content : attr(id);
+    display:block;
+    font-size: 1.7em;
+    padding: 1em 0 0.5em;
+    color: #025FF5;
+}
+code,
+pre{
+    font-family:monospace;
+}
+#options p,
+#overview p,
+#options ul,
+#overview ul{
+    margin: 1em;
+}
+#options li,
+#overview li{
+    margin: 0 0 0 2em;
+    list-style-type:disc;
+}
+#options li b{
+    font-size:0.8em;
 }
