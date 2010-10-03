@@ -27,21 +27,9 @@
 				var $button = null ;
 				o.separator = checkSeparator(o.separator);
 				this.$copy = this._makeCopy();
-				var presentationData = this.element.val();
-								
-				this.$copy.bind('keyup.'+o.bindNameSpace,$.proxy(function(){
-					clearTimeout(timeOut);					
-					var self = this;
-					var timeOut = setTimeout(function(){																			  
-						// don't update if the values remain the same							  
-						var newData = self.$copy.val();							
-						if (presentationData != newData){
-							presentationData = newData;
-							self._updateInput(this.format(newData, self.options.separator, false));
-						}		
-						// TODO callBack
-					},200);																	 																																		
-				},this))
+			var presentationData = this.element.val();
+
+				this.$copy.bind('keyup.'+o.bindNameSpace,$.proxy(this._keyUp, this))
 				.bind('keypress.'+o.bindNameSpace, $.proxy(function(event){ // Keycontrol
 					if(!this._validKey(event)){
 						event.preventDefault();
@@ -54,25 +42,37 @@
 			if (o.x1000Button != ''){
 				this.$button = $(o.x1000Button);
 				this.$copy.after(this.$button);
-				this.$button.bind('click.'+o.bindNameSpace,$.proxy(
-                        function(event)
-                        {
-                            this._x1000(event);
-                            this.element.trigger('change');
-                            (o.debug) ? console.info('[Event] Change | original Input') : null;
-                        }, this)
-                       );
-			}				
+				this.$button.bind('click.'+o.bindNameSpace,$.proxy(this._btnClick, this));
+			}
 		},
+        _keyUp : function(){
+			clearTimeout(timeOut);
+			var self = this;
+			var timeOut = setTimeout(function(){
+			// don't update if the values remain the same
+			var newData = self.$copy.val();
+				if (presentationData != newData){
+					presentationData = newData;
+					self._updateInput(this.format(newData, self.options.separator, false));
+				}
+				// TODO callBack
+			},200);
+		},
+        _btnClick : function(event){
+            this._x1000(event);
+            this.element.trigger('change');
+            (o.debug) ? console.info('[Event] Change | original Input') : null;
+
+         },
 		_makeCopy: function(){ // copy the input and hide the original
 			var $copy = this.element.clone();
             var newId = this.element.attr('id')+this.options.idSuffix;
-            
+
 			$copy.addClass(this.options.classInput)
 				.attr('id', newId)
                 .val($.ui.diginput.format($copy.val(), this.options.separator, false).string)
 				.insertBefore(this.element);
-			// Change the label	
+			// Change the label
 			var $label = $('label[for='+this.element.attr('id')+']');
 			if($label.length != 0){
 				$label.attr('for', newId);
@@ -106,7 +106,7 @@
 			var key;
 			if (!event.charCode) key = String.fromCharCode(event.which);
 				else key = String.fromCharCode(event.charCode);
-	
+
 			// authorized key
 			if (authorizedCharacter.indexOf(key) === -1) isValid = false;
 			// key combo
@@ -148,10 +148,10 @@
 				case "val":
 					if (value) {
 						this._updateInput($.ui.diginput.format(value, this.options.separator, false));
-					} 
+					}
 				break;
 			}
-			
+
 		}
 	});
 	/* Integer format with thousand separator */
@@ -185,7 +185,7 @@
 					floatSep: '.',
 					floatFix: '',
 					spacing: ' '
-				}				
+				}
 			};
 			switch(settings)
 			{
@@ -200,7 +200,7 @@
 				break;
 			case 'float':
 				settings = template.floatSetting;
-				break;			
+				break;
 			default:
 		// Use of default valued surcharged by the user separator
 			var alreadyUsedChar='';
@@ -307,7 +307,7 @@
 			        string : cleanDataFormat
 		};
 	};
-    
+
     $.extend( $.ui.diginput, {
 	    format: function( primaryData, separator, control) {
                 var regExpression;
@@ -402,5 +402,5 @@
                 };
 	    }
     });
-	
+
 })(jQuery);
