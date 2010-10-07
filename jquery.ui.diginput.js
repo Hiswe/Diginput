@@ -13,14 +13,12 @@
 	$.widget("ui.diginput",{
 		options:
         {
-			bindNameSpace : 'diginput',
     		idSuffix: '-copy',
 			classInput: 'diginput',
 			disabledClass: 'disabled',
 			val: false,
 			separator: 'fr',
 			x1000Button : '<a href="#" class="bouton boutonPetit"><span>x1000</span></a>',
-			onComplete : $.noop,
 			debug :true
 		},
 		_create: function()
@@ -28,17 +26,16 @@
             var $button = null ;
             this.options.separator = checkSeparator(this.options.separator);
             this.$copy = this._makeCopy();
-
             this.$copy
-                .bind('keyup.'+this.options.bindNameSpace,$.proxy(this._keyUp, this))
+                .bind('keyup.'+this.name,$.proxy(this._keyUp, this))
                 // Keycontrol
-				.bind('keypress.'+this.options.bindNameSpace, $.proxy(this._validKey, this))
+				.bind('keypress.'+this.name, $.proxy(this._validKey, this))
                 .bind('change', $.proxy(this._copyChangeEvent,this));
-			// add x1000 button
+            // add x1000 button
 			if (this.options.x1000Button != ''){
 				this.$button = $(this.options.x1000Button);
 				this.$copy.after(this.$button);
-				this.$button.bind('click.'+this.options.bindNameSpace,$.proxy(this._x1000, this));
+				this.$button.bind('click.'+this.name,$.proxy(this._x1000, this));
 			}
 		},
         _copyChangeEvent: function(event)
@@ -123,26 +120,30 @@
         {
 			this.element.fadeTo('slow', 1);
 			this.$copy.fadeOut('fast',function(){$(this).remove()});
-			if (this.options.x1000Button != ''){
-				this.$button.fadeOut('fast',function(){$(this).remove()});
-			}
+			if (this.options.x1000Button != '') this.$button.fadeOut('fast',function(){$(this).remove()});
 			$.Widget.prototype.destroy.call( this );
 		},
 		disable: function()
         {
-            var o = this.options;
-			this.$copy.attr('disabled','disabeld').fadeTo('normal',0.85, function(){$(this).addClass(o.disabledClass)});
+            this.$copy.attr('disabled','disabeld')
+                .fadeTo('normal',0.85,$.proxy(addClassToCopy,this));
 			if(this.$button){
-				this.$button.addClass(o.disabledClass).unbind('click.'+o.bindNameSpace).fadeTo('normal',0.5);
+				this.$button.addClass(this.options.disabledClass)
+                .unbind('click.'+this.name).fadeTo('normal',0.5);
 			}
+            function addClassToCopy()
+            {
+                this.$copy.addClass(this.options.disabledClass);
+            }
 		},
 		enable: function()
         {
-            var o = this.options;
-			this.$copy.removeClass(o.disabledClass).attr('disabled','').fadeTo('normal',1);
+			this.$copy.removeClass(this.options.disabledClass)
+                .attr('disabled','')
+                .fadeTo('normal',1);
 			if(this.$button){
-				this.$button.removeClass(o.disabledClass)
-				.bind('click.'+o.bindNameSpace,$.proxy(function(event){this._x1000(event)}, this))
+				this.$button.removeClass(this.options.disabledClass)
+				.bind('click.'+this.name,$.proxy(this._x1000, this))
 				.fadeTo('normal',1);
 			}
 		},
