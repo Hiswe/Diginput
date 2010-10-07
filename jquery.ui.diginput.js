@@ -153,10 +153,10 @@
         {
             this._updateInput(this._innerFormat(value));
         },
-        _innerFormat: function()
+        _innerFormat: function(value)
         {
             return $.ui.diginput.format(value, this.options.separator, false);
-        }
+        },
 		_setOption: function(key, value){
 			$.Widget.prototype._setOption.apply( this, arguments );
 			switch(key){
