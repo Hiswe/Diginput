@@ -49,7 +49,7 @@
             var self = this;
 			var timeOut = setTimeout(function(){
 			// don't update if the values remain the same
-			var newData = self.$copy.val();
+                var newData = self.$copy.val();
 				if (presentationData != newData){
                     if(self.options.debug) console.log('[DIGINPUT] evnt :: keyUp with diffrent data');
 					presentationData = newData;
@@ -169,6 +169,7 @@
 			}
 		}
 	});
+
 	/* Integer format with thousand separator */
 	function formatInteger(integer, thousandSeparator)
     {
@@ -179,6 +180,7 @@
 		}
 		return integer;
 	}
+
 	/* verify settings */
 	function checkSeparator(settings)
     {
