@@ -30,6 +30,6 @@ $(function(){
 	});
 	$('#setValue').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);
-		$input.diginput('val', 123456789);
+		$input.diginput('value', 123456789);
 	});
 });
