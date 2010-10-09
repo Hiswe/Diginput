@@ -16,27 +16,37 @@
     		idSuffix: '-copy',
 			classInput: 'diginput',
 			disabledClass: 'disabled',
-			val: false,
 			separator: 'fr',
 			x1000Button : '<a href="#" class="bouton boutonPetit"><span>x1000</span></a>',
-			debug :true
-		},
+			debug:true
+        },
 		_create: function()
         {
-            var $button = null ;
-            this.options.separator = checkSeparator(this.options.separator);
-            this.$copy = this._makeCopy();
-            this.$copy
-                .bind('keyup.'+this.name,$.proxy(this._keyUp, this))
-                // Keycontrol
-				.bind('keypress.'+this.name, $.proxy(this._validKey, this))
-                .bind('change', $.proxy(this._copyChangeEvent,this));
-            // add x1000 button
-			if (this.options.x1000Button != ''){
-				this.$button = $(this.options.x1000Button);
-				this.$copy.after(this.$button);
-				this.$button.bind('click.'+this.name,$.proxy(this._x1000, this));
-			}
+            if (!window.console && !console.log && !console.warn) this.options.debug = false;
+            if (this.options.debug) console.info('[DIGINPUT] create');
+            if(this.element.is('input[type=text]'))
+            {
+                var $button = null;
+                this.options.separator = checkSeparator(this.options.separator);
+                this._makeCopy();
+                this.value(this.element.val());
+                this.$copy
+                    .bind('keyup.'+this.name,$.proxy(this._keyUp, this))
+                    // KeyControl
+                    .bind('keypress.'+this.name, $.proxy(this._validKey, this))
+                    .bind('change', $.proxy(this._copyChangeEvent,this));
+                // add x1000 button
+                if (this.options.x1000Button != '')
+                {
+                    this.$button = $(this.options.x1000Button);
+                    this.$copy.after(this.$button);
+                    this.$button.bind('click.'+this.name,$.proxy(this._x1000, this));
+                }
+            }
+            else if(this.options.debug)
+            {
+                console.warn('[DIGINPUT] create : init only with text input')
+            }
 		},
         _copyChangeEvent: function(event)
         {
@@ -50,53 +60,45 @@
 			var timeOut = setTimeout(function(){
 			// don't update if the values remain the same
                 var newData = self.$copy.val();
-				if (presentationData != newData){
-                    if(self.options.debug) console.log('[DIGINPUT] evnt :: keyUp with diffrent data');
-					presentationData = newData;
-					self._updateInput(self._innerFormat(newData, self.options.separator, false));
+				if (self.inputValue.string != newData){
+                    if(self.options.debug) console.log('[DIGINPUT] event :: keyUp with diffrent data');
+					self.value(newData);
 				}
+                else
+                {
+                    if(self.options.debug) console.log('[DIGINPUT] event :: keyp with same data');
+                }
 				// TODO callBack
 			},200);
 		},
 		_makeCopy: function(){ // copy the input and hide the original
 			var $copy = this.element.clone();
             var newId = this.element.attr('id')+this.options.idSuffix;
-            this.value = this._innerFormat($copy.val());
 
 			$copy.addClass(this.options.classInput)
 				.attr('id', newId)
-                .val(this.value.string)
 				.insertBefore(this.element);
 			// Change the label
 			var $label = $('label[for='+this.element.attr('id')+']');
-			if($label.length != 0){
-				$label.attr('for', newId);
-			}
+			if($label.length) $label.attr('for', newId);
 			// mask the previous label
 			(this.options.debug) ? this.element.fadeTo('normal', 0.5) : this.element.hide();
-			return $copy;
+			this.$copy = $copy;
+            this.value(this.element.val());
 		},
 		_x1000: function(event)
         {
 			event.preventDefault();
 			event.stopPropagation();
             this.element.trigger('change');
-            (this.options.debug) ? console.info('[Event] Change | original Input') : null;
+            if (this.options.debug) console.info('[Event] Change | original Input');
 			var rawData = this.element.val();
-			if (!rawData){
-				rawData = 1;
-			}
+			if (!rawData) rawData = 1;
 			var multipliedData = rawData * 1000;
 			if (multipliedData.toString().indexOf('e') == -1){
-				this._updateInput(this._innerFormat(multipliedData));
+				this.value(multipliedData);
 			}
 			// TODO callBack
-		},
-		_updateInput: function(newData)
-        { // Update the inputs
-                this.value = newData;
-				this.$copy.val(newData.string);
-			    this.element.val(newData.number);
 		},
 		_validKey: function(event) // Check if a key is valid
         {
@@ -147,24 +149,29 @@
 				.fadeTo('normal',1);
 			}
 		},
-        getVal: function()
+        value: function(value)
         {
-        },
-        setVal: function(value)
-        {
-            this._updateInput(this._innerFormat(value));
-        },
-        _innerFormat: function(value)
-        {
-            return $.ui.diginput.format(value, this.options.separator, false);
+            if(typeof value == "undefined"){
+                 return this.inputValue;
+             }
+            else
+            {
+                this.inputValue = $.ui.diginput.format(value, this.options.separator, true);
+
+                this.$copy.val(this.inputValue.string);
+                this.element.val(this.inputValue.number);
+
+            }
         },
 		_setOption: function(key, value){
 			$.Widget.prototype._setOption.apply( this, arguments );
 			switch(key){
-				case "val":
+				case "separator":
 					if (value) {
-						this._updateInput(this._innerFformat(value));
-					}
+						this.options.separator = checkSeparator(value);
+                     }else{
+                        return this.options.separator;
+                     }
 				break;
 			}
 		}
@@ -175,9 +182,7 @@
     {
 		integer = integer.replace(/\B(?=(\d\d\d)*$)/g,thousandSeparator);
 		// firefox need it, not chrome... duno why
-		if(integer.charAt(integer.length-1) == thousandSeparator){
-			integer = integer.substring(0,integer.length-1);
-		}
+		if(integer.charAt(integer.length-1) == thousandSeparator) integer = integer.substring(0,integer.length-1);
 		return integer;
 	}
 
@@ -235,7 +240,7 @@
 	}
 	/* Thousand separator */
     $.extend( $.ui.diginput, {
-	    format: function( primaryData, separator, control) {
+	    format: function( primaryData, separator, isSeparatorControled) {
                 var regExpression;
                 var reg;
                 var settings;
@@ -269,7 +274,7 @@
                 if (separator == undefined){
                     settings = checkSeparator($.ui.diginput.prototype.options.separator);
                 }
-                if(control == undefined && separator != undefined){
+                if(typeof isSeparatorControled != "boolean" && !isSeparatorControled && separator != undefined){
                     // seperator char not already defined (direct use of the public method)
                     settings = checkSeparator(separator);
                     if (typeof separator == 'string'){

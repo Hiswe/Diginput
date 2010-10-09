@@ -60,11 +60,6 @@
         </div>
         <div id="options">
             <dl>
-                <dt><strong>bindNameSpace</strong> <span class="type">string</span><span class="default">diginput</span>
-                </dt>
-                <dd>
-                    <p>namespace associé à tout les évènements générés par le widget</p>
-                </dd>
                 <dt><strong>idSuffix</strong> <span class="type">string</span><span class="default">-copy</span></dt>
                 <dd>
                     <p>Suffix ajouté à l'id du champ cloné ( $('#foo').diginput(); génèrera un champ nommé '#foo-copy')
@@ -79,11 +74,6 @@
                 </dt>
                 <dd>
                     <p>Class ajoutée au au champ cloné à l'appel de la méthode 'disable'</p>
-                </dd>
-                <dt><strong>val</strong> <span class="type">boolean</span><span class="default">false</span></dt>
-                <dd>
-                    <p>Á virer du code. utiliser la fonction .val() de jQuery à la place.</p>
-                    <p>Faire une méthode pour setter la valeur</p>
                 </dd>
                 <dt>
                     <strong>separator</strong> <span class="type">string || object</span><span class="default">fr</span>
@@ -162,12 +152,20 @@
                     <p>Enable the Diginput.</p>
                 </dd>
                 <dt>
-                    <strong>options</strong>
-                    <code>.diginput("options", "val", [value])</code>
+                    <strong>setVal</strong>
+                    <code>.diginput("setVal", value)</code>
                 </dt>
                 <dd>
-                    <p>set the val of the input</p>
-                    <p>should be a setter function</p>
+                    <p>Set the val to both the orifinal input and the presentation one.</p>
+                    <p> Doesn't trigger the change event (has the jQuery val() function does).</p>
+                </dd>
+
+                <dt>
+                    <strong>options</strong>
+                    <code>.diginput("options", "separator",[value])</code>
+                </dt>
+                <dd>
+                    <p>Get or Set the separator option</p>
                 </dd>
             </dl>
         </div>

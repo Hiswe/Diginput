@@ -1,6 +1,6 @@
 $(function(){
 //	$.ui.diginput.format(1000);
-    var $input = $('input.notionnel'); 
+    var $input = $('input.notionnel');
 	$('#change').hide();
 	$input.diginput();
 	/* Buttons */
@@ -15,21 +15,21 @@ $(function(){
 	$('#disable').bind('click.action', function(){
 		$(this).fadeTo('normal', 0.5);
 		$input.diginput("disable");
-	});	
+	});
 	$('#enable').bind('click.action', function(){
-		$(this).fadeTo('normal', 0.5);											   
-		$input.diginput('enable');
+		$(this).fadeTo('normal', 0.5);
+        $input.diginput('enable');
 	});
 	$('#destroy').bind('click.action', function(){
-		$(this).fadeTo('normal', 0.5);												
+		$(this).fadeTo('normal', 0.5);
 		$input.diginput('destroy');
 	});
 	$('#make').bind('click.action', function(){
-		$(this).fadeTo('normal', 0.5);											 
+		$(this).fadeTo('normal', 0.5);
 		$input.diginput();
-	});	
+	});
 	$('#setValue').bind('click.action', function(){
-		$(this).fadeTo('normal', 0.5);												 
-		$input.diginput('option' ,'val', 123456789);
+		$(this).fadeTo('normal', 0.5);
+		$input.diginput('val', 123456789);
 	});
 });
