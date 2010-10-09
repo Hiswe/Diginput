@@ -33,7 +33,7 @@
                 this.$copy
                     .bind('keyup.'+this.name,$.proxy(this._keyUp, this))
                     // KeyControl
-                    .bind('keypress.'+this.name, $.proxy(this._validKey, this))
+                    .bind('keyUpress.'+this.name, $.proxy(this._validKey, this))
                     .bind('change', $.proxy(this._copyChangeEvent,this));
                 // add x1000 button
                 if (this.options.x1000Button != '')
@@ -66,7 +66,7 @@
 				}
                 else
                 {
-                    if(self.options.debug) console.log('[DIGINPUT] event :: keyp with same data');
+                    if(self.options.debug) console.log('[DIGINPUT] event :: keyUp with same data');
                 }
 				// TODO callBack
 			},200);
@@ -91,7 +91,7 @@
 			event.preventDefault();
 			event.stopPropagation();
             this.element.trigger('change');
-            if (this.options.debug) console.info('[Event] Change | original Input');
+            if (this.options.debug) console.log('[Event] Change | original Input');
 			var rawData = this.element.val();
 			if (!rawData) rawData = 1;
 			var multipliedData = rawData * 1000;
@@ -157,7 +157,6 @@
             else
             {
                 this.inputValue = $.ui.diginput.format(value, this.options.separator, true);
-
                 this.$copy.val(this.inputValue.string);
                 this.element.val(this.inputValue.number);
 

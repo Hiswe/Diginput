@@ -121,9 +121,6 @@
                     <p>Code html inséré pour le bouton x1000</p>
                     <p>'' == pas de bouton</p>
                 </dd>
-                <dt><strong>onComplete</strong> <span class="type">function</span><span class="default">$.noop</span>
-                </dt>
-                <dd><p>Ne fonctionne pas encore</p></dd>
                 <dt><strong>debug</strong> <span class="type">boolean</span><span class="default">false</span></dt>
                 <dd><p>Ajout de message de débug. Nécessite une console ouverte</p></dd>
             </dl>
@@ -140,24 +137,25 @@
                 </dd>
                 <dt>
                     <strong>disable</strong>
-                    <code>.diginput("destroy")</code></dt>
+                    <code>.diginput("disable")</code></dt>
                 <dd>
                     <p>Disable the Diginput (input &amp; x1000 button).</p>
                 </dd>
                 <dt>
                     <strong>enable</strong>
-                    <code>.diginput("destroy")</code>
+                    <code>.diginput("enable")</code>
                 </dt>
                 <dd>
                     <p>Enable the Diginput.</p>
                 </dd>
                 <dt>
-                    <strong>setVal</strong>
-                    <code>.diginput("setVal", value)</code>
+                    <strong>value</strong>
+                    <code>.diginput("value",[value])</code>
                 </dt>
                 <dd>
-                    <p>Set the val to both the orifinal input and the presentation one.</p>
-                    <p> Doesn't trigger the change event (has the jQuery val() function does).</p>
+                    <p>Get or Set the val</p>
+                    <p>The "Set mode" will apply on both the original input and the presentation one.</p>
+                    <p>Doesn't trigger the change event (has the jQuery val() function does).</p>
                 </dd>
 
                 <dt>
