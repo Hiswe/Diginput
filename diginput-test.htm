@@ -6,7 +6,7 @@
    		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/qunit.js"></script>
         <script type="text/javascript" src="jquery.ui.diginput.js"></script>
-        <script>
+        <script type="text/javascript">
               $(document).ready(function(){
 //			  	QUnit.log = function(result, message)
 //				{
@@ -18,7 +18,7 @@
 			    module("FrSetting");
 			    test("float data", function()
 			    {
-					expect(5);
+					expect(6);
 					equals($.ui.diginput.format(0,'fr').string,
 						'0');
 					equals($.ui.diginput.format(100,'fr').string,
@@ -29,11 +29,14 @@
 						'1 234 567 890.7654321');
 					equals($.ui.diginput.format(1234567890.7654321).string,
 						'1 234 567 890.7654321',
-						'No format scheme passed in param');	
+						'No format scheme passed in param');
+                    equals($.ui.diginput.format(-1234567890.7654321).string,
+						'-1 234 567 890.7654321',
+						'Negative value');
 			    });			
 			    test("String data", function()
 			    {
-					expect(8);
+					expect(10);
 					equals($.ui.diginput.format('','fr').string,
 						'');
 					equals($.ui.diginput.format('','fr').number,
@@ -50,7 +53,13 @@
 						'1 234 567 890.987654321');
 					equals($.ui.diginput.format('1234567890.987654321').string,
 						'1 234 567 890.987654321',
-						'No format scheme passed in param');	
+						'No format scheme passed in param');
+                    equals($.ui.diginput.format('-1234567890.987654321').string,
+						'-1 234 567 890.987654321',
+						'Negative value');
+                    equals($.ui.diginput.format('-123456-7890.98---7654321').string,
+						'-1 234 567 890.987654321',
+						'Negative value');
 			    });
 				test("String with coma replacement", function()
 			    {
@@ -67,7 +76,7 @@
 						'');					
 					equals($.ui.diginput.format('a.a','fr').number,
 						'');
-					equals($.ui.diginput.format('oihaabiajnb10q0bijaààà0,0/**/=0','fr').string,
+					equals($.ui.diginput.format('oihaabiajnb10q0bijaààà0,0/**=0','fr').string,
 						'1 000.00');
 					equals($.ui.diginput.format('12zahagjabjèè34567@@89@0.....9876543*--++21','fr').string,
 							'1 234 567 890.987654321');	
@@ -99,22 +108,24 @@
 				module("Custom set of options");
 				test("Mixed test", function()
 			    {
-					expect(7);
+					expect(8);
 					equals($.ui.diginput.format(100.00,{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
 						'100'); // en js 100.00 = 100
 					equals($.ui.diginput.format('100|00',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
 						'100|00');
 					equals($.ui.diginput.format('100o00',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
-						'100|00');						
+						'100|00');
+                    equals($.ui.diginput.format('100o00',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
+						'100|00');
 					equals($.ui.diginput.format('1234567890,987654321',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
-						'1_234_567_890_987_654_321');			
-					equals($.ui.diginput.format('1234567890|4321',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
-						'1_234_567_890|4321');
+						'1_234_567_890_987_654_321');
+					equals($.ui.diginput.format('1234567890o4321',{spacing:'-', floatSep:'k',floatFix:'ko'}).string,
+						'1 234 567 890k4321');
 					equals($.ui.diginput.format('aojajon123hoo^^^^¨.45€€6````....7.8£££9|0££',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
 						'0|1234567890',
 						'No integer part');
 					equals($.ui.diginput.format('ajajn?123h^^^^¨.45ooo€€6````....7.8£££9|0££',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
-						'12_345|67890');						
+						'12_345|67890');
 			    });
 				test("Test the float returned value", function()
 			    {
@@ -134,7 +145,7 @@
 						'No integer part');
 					equals($.ui.diginput.format('ajajn?123h^^^^¨.45ooo€€6````....7.8£££9|0££',{spacing:'_', floatSep:'|',floatFix:'|o'}).number,
 						'12345.67890');						
-			    });			
+			    });
 			  });
         </script>
     </head>

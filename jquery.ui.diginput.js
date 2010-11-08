@@ -1,7 +1,8 @@
 /*
- * jQuery UI Diginput @VERSION
+ * jQuery UI Diginput @1.1
  *
  * Copyright 2010, ©Hiswe
+ * https://github.com/Hiswe/Diginput
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  *
@@ -11,6 +12,7 @@
  */
 (function($, undefined){
 	$.widget("ui.diginput",{
+        _isDisabled : false,
 		options:
         {
     		idSuffix: '-copy',
@@ -18,7 +20,7 @@
 			disabledClass: 'disabled',
 			separator: 'fr',
 			x1000Button : '<a href="#" class="bouton boutonPetit"><span>x1000</span></a>',
-			debug:true
+			debug:false
         },
 		_create: function()
         {
@@ -90,15 +92,16 @@
         {
 			event.preventDefault();
 			event.stopPropagation();
-            this.element.trigger('change');
-            if (this.options.debug) console.log('[Event] Change | original Input');
-			var rawData = this.element.val();
-			if (!rawData) rawData = 1;
-			var multipliedData = rawData * 1000;
-			if (multipliedData.toString().indexOf('e') == -1){
-				this.value(multipliedData);
-			}
-			// TODO callBack
+            if (!this._isDisabled){
+                if (this.options.debug) console.log('[Event] Change | original Input');
+                var rawData = this.element.val();
+                if (!rawData) rawData = 1;
+                var multipliedData = rawData * 1000;
+                if (multipliedData.toString().indexOf('e') == -1){
+                    this.value(multipliedData);
+                }
+                this.element.trigger('change');
+            }
 		},
 		_validKey: function(event) // Check if a key is valid
         {
@@ -125,14 +128,17 @@
 			if (this.options.x1000Button != '') this.$button.fadeOut('fast',function(){$(this).remove()});
 			$.Widget.prototype.destroy.call( this );
 		},
+        isDisabled: function(){
+            return this._isDisabled;
+        },
 		disable: function()
         {
-            this.$copy.attr('disabled','disabeld')
+            this.$copy.attr('disabled','disabled')
                 .fadeTo('normal',0.85,$.proxy(addClassToCopy,this));
 			if(this.$button){
-				this.$button.addClass(this.options.disabledClass)
-                .unbind('click.'+this.name).fadeTo('normal',0.5);
+				this.$button.addClass(this.options.disabledClass).fadeTo('normal',0.5);
 			}
+            this._isDisabled = true;
             function addClassToCopy()
             {
                 this.$copy.addClass(this.options.disabledClass);
@@ -144,10 +150,9 @@
                 .attr('disabled','')
                 .fadeTo('normal',1);
 			if(this.$button){
-				this.$button.removeClass(this.options.disabledClass)
-				.bind('click.'+this.name,$.proxy(this._x1000, this))
-				.fadeTo('normal',1);
+				this.$button.removeClass(this.options.disabledClass).fadeTo('normal',1);
 			}
+            this._isDisabled = false;
 		},
         value: function(value)
         {
@@ -225,13 +230,21 @@
 				settings = template.floatSetting;
 				break;
 			default:
-		// Use of default valued surcharged by the user separator
+		// Use of default valued surcharged by the user separator and the - sign
 			var alreadyUsedChar='';
 			$.each(settings, function(key, value){
-				var reg = new RegExp('^[0-9'+alreadyUsedChar+']*(.){1}.*','g');
-				value = value.replace(reg, '$1');
-				alreadyUsedChar += value;
-				settings[key] = value;
+                // remove all used char
+                var removeReg = new RegExp("[0-9-"+alreadyUsedChar+"]", "g");
+                var newValue = value.replace(removeReg, '');
+                //
+                if(newValue){
+                    var character = newValue.substr(0,1);
+                    settings[key] = character;
+                    alreadyUsedChar += character;
+                }else{
+                    settings[key] = template.frSetting[key];
+                    alreadyUsedChar += template.frSetting[key];
+                }
 			});
 			settings = $.extend({},template.frSetting, settings);
 		}
@@ -246,6 +259,7 @@
                 var cleanData = null; /* common float */
                 var cleanDataNumber = null; /* clean number */
                 var cleanDataFormat = null; /* formated number */
+                var isNegative = false;
                 /*Data verificiation*/
                 try
                 {
@@ -284,6 +298,8 @@
                 }
                 /* string behavior */
                 if (typeof primaryData =='string'){
+                    // test if it's a negative number
+                    if(/^-{1}/.test(primaryData)) isNegative = true;
                     // remove all but digits and float separators
                     regExpression = "[^[0-9"+settings.floatSep+settings.floatFix+"]]*";
                     reg = new RegExp(regExpression, "g");
@@ -327,6 +343,10 @@
                     cleanDataFormat = cleanDataSplit[0]+settings.floatSep+cleanDataSplit[1];
                 }
                 cleanDataNumber = (cleanData=='') ? '' : parseFloat(cleanData);
+                if(isNegative){
+                    cleanDataNumber = -cleanDataNumber;
+                    cleanDataFormat = '-'+cleanDataFormat;
+                }
                 return {    number : cleanDataNumber,
                             string : cleanDataFormat
                 };
