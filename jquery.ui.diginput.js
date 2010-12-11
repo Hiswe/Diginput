@@ -1,5 +1,5 @@
 /*
- * jQuery UI Diginput @1.1
+ * jQuery UI Diginput @1.0
  *
  * Copyright 2010, ©Hiswe
  * https://github.com/Hiswe/Diginput
@@ -13,6 +13,7 @@
 (function($, undefined){
 	$.widget("ui.diginput",{
         _isDisabled : false,
+        _isInitialised: false,
 		options:
         {
     		idSuffix: '-copy',
@@ -24,10 +25,16 @@
         },
 		_create: function()
         {
-            if (!window.console && !console.log && !console.warn) this.options.debug = false;
-            if (this.options.debug) console.info('[DIGINPUT] create');
-            if(this.element.is('input[type=text]'))
+            if (this.options.debug){
+                if (!window.console && !console.log && !console.warn) this.options.debug = false;
+            }
+            this.id = this.element.attr('id');
+            if (this.options.debug) console.info('[DIGINPUT] create #',this.id);
+            var type = this.element.attr('type');
+            type = (type)? type : 'text';
+            if(this.element.is('input') && type == 'text')
             {
+                this._isInitialised = true;
                 var $button = null;
                 this.options.separator = checkSeparator(this.options.separator);
                 this._makeCopy();
@@ -44,9 +51,11 @@
                     this.$copy.after(this.$button);
                     this.$button.bind('click.'+this.name,$.proxy(this._x1000, this));
                 }
+
             }
             else if(this.options.debug)
             {
+                this._error();
                 console.warn('[DIGINPUT] create : init only with text input')
             }
 		},
@@ -124,8 +133,10 @@
 		destroy: function()
         {
 			this.element.fadeTo('slow', 1);
-			this.$copy.fadeOut('fast',function(){$(this).remove()});
-			if (this.options.x1000Button != '') this.$button.fadeOut('fast',function(){$(this).remove()});
+            if(this._isInitialised){
+                this.$copy.fadeOut('fast',function(){$(this).remove()});
+                if (this.options.x1000Button != '') this.$button.fadeOut('fast',function(){$(this).remove()});
+            }
 			$.Widget.prototype.destroy.call( this );
 		},
         isDisabled: function(){
@@ -133,38 +144,51 @@
         },
 		disable: function()
         {
-            this.$copy.attr('disabled','disabled')
-                .fadeTo('normal',0.85,$.proxy(addClassToCopy,this));
-			if(this.$button){
-				this.$button.addClass(this.options.disabledClass).fadeTo('normal',0.5);
-			}
-            this._isDisabled = true;
-            function addClassToCopy()
-            {
-                this.$copy.addClass(this.options.disabledClass);
+            if(this._isInitialised){
+                this.$copy.attr('disabled','disabled')
+                .fadeTo('normal',0.85,$.proxy(function(){
+                    this.$copy.addClass(this.options.disabledClass);
+                },this));
+                if(this.$button){
+                    this.$button.addClass(this.options.disabledClass).fadeTo('normal',0.5);
+                }
+                this._isDisabled = true;
+            }else{
+                this._error();
             }
 		},
 		enable: function()
         {
-			this.$copy.removeClass(this.options.disabledClass)
-                .attr('disabled','')
-                .fadeTo('normal',1);
-			if(this.$button){
-				this.$button.removeClass(this.options.disabledClass).fadeTo('normal',1);
-			}
-            this._isDisabled = false;
+            if(this._isInitialised){
+                this.$copy.removeClass(this.options.disabledClass)
+                    .attr('disabled','')
+                    .fadeTo('normal',1);
+                if(this.$button){
+                    this.$button.removeClass(this.options.disabledClass).fadeTo('normal',1);
+                }
+                this._isDisabled = false;
+            }else{
+                this._error();
+            }
 		},
+        _error: function(){
+            if (this.options.debug && console.warn) console.warn('[DIGINPUT] #', this.id,' has not been initialised properly');
+        },
         value: function(value)
         {
-            if(typeof value == "undefined"){
-                 return this.inputValue;
-             }
-            else
-            {
-                this.inputValue = $.ui.diginput.format(value, this.options.separator, true);
-                this.$copy.val(this.inputValue.string);
-                this.element.val(this.inputValue.number);
+            if(this._isInitialised){
+                if(typeof value == "undefined"){
+                     return this.inputValue;
+                 }
+                else
+                {
+                    this.inputValue = $.ui.diginput.format(value, this.options.separator, true);
+                    this.$copy.val(this.inputValue.string);
+                    this.element.val(this.inputValue.number);
 
+                }
+            }else{
+                this._error();
             }
         },
 		_setOption: function(key, value){
