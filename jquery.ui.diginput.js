@@ -1,7 +1,7 @@
 /*
  * jQuery UI Diginput @1.0
  *
- * Copyright 2010, ©Hiswe
+ * Copyright 2010, ï¿½Hiswe
  * https://github.com/Hiswe/Diginput
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
@@ -12,8 +12,6 @@
  */
 (function($, undefined){
 	$.widget("ui.diginput",{
-        _isDisabled : false,
-        _isInitialised: false,
 		options:
         {
     		idSuffix: '-copy',
@@ -25,11 +23,11 @@
         },
 		_create: function()
         {
-            if (this.options.debug){
-                if (!window.console && !console.log && !console.warn) this.options.debug = false;
-            }
+            if (this.options.debug && typeof window.console === "undefined") this.options.debug = false;
             this.id = this.element.attr('id');
             if (this.options.debug) console.info('[DIGINPUT] create #',this.id);
+            this._isDisabled = false;
+            this._isInitialised = false;
             var type = this.element.attr('type');
             type = (type)? type : 'text';
             if(this.element.is('input') && type == 'text')
@@ -38,12 +36,12 @@
                 var $button = null;
                 this.options.separator = checkSeparator(this.options.separator);
                 this._makeCopy();
-                this.value(this.element.val());
-                this.$copy
-                    .bind('keyup.'+this.name,$.proxy(this._keyUp, this))
-                    // KeyControl
-                    .bind('keyUpress.'+this.name, $.proxy(this._validKey, this))
-                    .bind('change', $.proxy(this._copyChangeEvent,this));
+                this.value(this.element.val(), true);
+                this.$copy.bind({
+                   'keyup.diginput' : $.proxy(this._keyUp, this),
+                   'keyUpress.diginput' : $.proxy(this._validKey, this),
+                   'change.diginput' : $.proxy(this._copyChangeEvent, this)
+                });
                 // add x1000 button
                 if (this.options.x1000Button != '')
                 {
@@ -72,7 +70,7 @@
 			// don't update if the values remain the same
                 var newData = self.$copy.val();
 				if (self.inputValue.string != newData){
-                    if(self.options.debug) console.log('[DIGINPUT] event :: keyUp with diffrent data');
+                    if(self.options.debug) console.log('[DIGINPUT] event :: keyUp with different data');
 					self.value(newData);
 				}
                 else
@@ -83,11 +81,13 @@
 			},200);
 		},
 		_makeCopy: function(){ // copy the input and hide the original
-			var $copy = this.element.clone();
-            var newId = this.element.attr('id')+this.options.idSuffix;
+			var $copy = this.element.clone(),
+                newId = this.element.attr('id')+this.options.idSuffix,
+                newName = this.element.attr('name')+this.options.idSuffix;
 
 			$copy.addClass(this.options.classInput)
 				.attr('id', newId)
+				.attr('name', newName)
 				.insertBefore(this.element);
 			// Change the label
 			var $label = $('label[for='+this.element.attr('id')+']');
@@ -95,7 +95,6 @@
 			// mask the previous label
 			(this.options.debug) ? this.element.fadeTo('normal', 0.5) : this.element.hide();
 			this.$copy = $copy;
-            this.value(this.element.val());
 		},
 		_x1000: function(event)
         {
@@ -142,30 +141,46 @@
         isDisabled: function(){
             return this._isDisabled;
         },
-		disable: function()
-        {
+		disable: function (withAnimation) {
             if(this._isInitialised){
-                this.$copy.attr('disabled','disabled')
-                .fadeTo('normal',0.85,$.proxy(function(){
-                    this.$copy.addClass(this.options.disabledClass);
-                },this));
-                if(this.$button){
-                    this.$button.addClass(this.options.disabledClass).fadeTo('normal',0.5);
+                if (typeof withAnimation !== "undefined" && withAnimation === false) {
+                    this.$copy.attr('disabled','disabled')
+                    .css('opacity',0.85).addClass(this.options.disabledClass);
+                    if(this.$button){
+                        this.$button.addClass(this.options.disabledClass).css('opacity',0.5);
+                    }
+                }else{
+                    this.$copy.attr('disabled','disabled')
+                    .fadeTo('normal',0.85,$.proxy(function(){
+                        this.$copy.addClass(this.options.disabledClass);
+                    },this));
+                    if(this.$button){
+                        this.$button.addClass(this.options.disabledClass).fadeTo('normal',0.5);
+                    }
                 }
                 this._isDisabled = true;
             }else{
                 this._error();
             }
 		},
-		enable: function()
-        {
+		enable: function (withAnimation) {
             if(this._isInitialised){
-                this.$copy.removeClass(this.options.disabledClass)
-                    .attr('disabled','')
-                    .fadeTo('normal',1);
-                if(this.$button){
-                    this.$button.removeClass(this.options.disabledClass).fadeTo('normal',1);
+                if (typeof withAnimation !== "undefined" && withAnimation === false) {
+                    this.$copy.removeClass(this.options.disabledClass)
+                        .attr('disabled','')
+                        .css('opacity',1);
+                    if(this.$button){
+                        this.$button.removeClass(this.options.disabledClass).css('opacity',1);
+                    }
+                }else{
+                    this.$copy.removeClass(this.options.disabledClass)
+                        .attr('disabled','')
+                        .fadeTo('normal',1);
+                    if(this.$button){
+                        this.$button.removeClass(this.options.disabledClass).fadeTo('normal',1);
+                    }
                 }
+
                 this._isDisabled = false;
             }else{
                 this._error();
@@ -174,25 +189,25 @@
         _error: function(){
             if (this.options.debug && console.warn) console.warn('[DIGINPUT] #', this.id,' has not been initialised properly');
         },
-        value: function(value)
+        value: function(value, onCreate)
         {
             if(this._isInitialised){
+                onCreate = (typeof onCreate === "undefined") ? false : onCreate;
                 if(typeof value == "undefined"){
                      return this.inputValue;
                  }
                 else
                 {
                     this.inputValue = $.ui.diginput.format(value, this.options.separator, true);
-                    this.$copy.val(this.inputValue.string);
+                    this.$copy.val(this.inputValue.string).trigger('diginputupdate', onCreate);
                     this.element.val(this.inputValue.number);
-
                 }
             }else{
                 this._error();
             }
         },
 		_setOption: function(key, value){
-			$.Widget.prototype._setOption.apply( this, arguments );
+			$.Widget.prototype._setOption.apply(this, arguments);
 			switch(key){
 				case "separator":
 					if (value) {
@@ -208,9 +223,12 @@
 	/* Integer format with thousand separator */
 	function formatInteger(integer, thousandSeparator)
     {
-		integer = integer.replace(/\B(?=(\d\d\d)*$)/g,thousandSeparator);
-		// firefox need it, not chrome... duno why
-		if(integer.charAt(integer.length-1) == thousandSeparator) integer = integer.substring(0,integer.length-1);
+
+        if(thousandSeparator !== ''){ // don't need a separator if empty string
+            integer = integer.replace(/\B(?=(\d\d\d)*$)/g,thousandSeparator);
+            // firefox need it, not chrome... duno why
+            if(integer.charAt(integer.length-1) == thousandSeparator) integer = integer.substring(0,integer.length-1);
+        }
 		return integer;
 	}
 
@@ -237,7 +255,12 @@
 					floatSep: '.',
 					floatFix: '',
 					spacing: ' '
-				}
+				},
+                numberSetting: {
+                    floatSep: '.',
+					floatFix: ',',
+					spacing: ''
+                }
 			};
 			switch(settings)
 			{
@@ -253,21 +276,26 @@
 			case 'float':
 				settings = template.floatSetting;
 				break;
+            case 'number':
+				settings = template.numberSetting;
+				break;
 			default:
 		// Use of default valued surcharged by the user separator and the - sign
 			var alreadyUsedChar='';
 			$.each(settings, function(key, value){
-                // remove all used char
-                var removeReg = new RegExp("[0-9-"+alreadyUsedChar+"]", "g");
-                var newValue = value.replace(removeReg, '');
-                //
-                if(newValue){
-                    var character = newValue.substr(0,1);
-                    settings[key] = character;
-                    alreadyUsedChar += character;
-                }else{
-                    settings[key] = template.frSetting[key];
-                    alreadyUsedChar += template.frSetting[key];
+                if (value !== ''){  // accept empty string
+                   // remove all used char
+                    var removeReg = new RegExp("[0-9-"+alreadyUsedChar+"]", "g");
+                    var newValue = value.replace(removeReg, '');
+                    //
+                    if(newValue){
+                        var character = newValue.substr(0,1);
+                        settings[key] = character;
+                        alreadyUsedChar += character;
+                    }else{
+                        settings[key] = template.frSetting[key];
+                        alreadyUsedChar += template.frSetting[key];
+                    }
                 }
 			});
 			settings = $.extend({},template.frSetting, settings);
@@ -376,5 +404,4 @@
                 };
 	    }
     });
-
 })(jQuery);

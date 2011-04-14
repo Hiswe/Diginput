@@ -37,6 +37,7 @@
                 <li>Les données sont copiées dans l'input caché sans le formatage</li>
                 <li>L'input d'affichage n'autorise pas les caractères autres que numérique, séparateurs de décimale & séparater de milliers</li>
                 <li>L'évènement change de l'input d'affichage est répercuté sur l'input de base</li>
+                <li>L'input copié a pour <b>id</b> et <b>name</b> celui de l'original suffixé par l'<b>option idSUffix</b></li>
             </ul>
             <p>
                 <strong>Utility functions</strong>
@@ -162,7 +163,8 @@
                 <dd>
                     <p>Get or Set the val</p>
                     <p>The "Set mode" will apply on both the original input and the presentation one.</p>
-                    <p>Doesn't trigger the change event (has the jQuery val() function does).</p>
+                    <p>Doesn't trigger the change event (has the jQuery val() function does)...</p>
+                    <p>... but trigger a <b>diginputupdate</b> event on the copy.</p>
                 </dd>
 
                 <dt>

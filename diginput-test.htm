@@ -15,6 +15,7 @@
 //			           window.console.log(result +' :: '+ message);
 //			        }
 //				}
+                //*
 			    module("FrSetting");
 			    test("float data", function()
 			    {
@@ -87,6 +88,8 @@
 					equals($.ui.diginput.format('12zahagjabjèè34567,,,89@0,,,,987,6,,,543*--++,21','fr').string,
 							'1 234 567.890987654321');										
 			    });
+			    //*/
+                //*
 			    module("EnSetting");
 				test("Mixed test", function()
 			    {
@@ -105,10 +108,34 @@
 					equals($.ui.diginput.format('aojajon?123hoo^^^^¨.45€€6````7.8£££9,,,,,,,0££','en').string,
 						'123.456.789,0');						
 			    });
+			    //*/
 				module("Custom set of options");
-				test("Mixed test", function()
+                test("No space separator", function ()	{
+                    var separator = {
+                        floatSep: '.',
+                        floatFix: 'o',
+                        spacing: ''
+                    };
+					equals($.ui.diginput.format(100.00,separator).string,
+						'100'); // en js 100.00 = 100
+					equals($.ui.diginput.format('100.00',separator).string,
+						'100.00');
+					equals($.ui.diginput.format('100o00',separator).string,
+						'100.00');
+                    equals($.ui.diginput.format('100o00',separator).string,
+						'100.00');
+					equals($.ui.diginput.format('1234567890,987654321',separator).string,
+						'1234567890987654321');
+					equals($.ui.diginput.format('1234567890o4321',separator).string,
+						'1234567890.4321');
+					equals($.ui.diginput.format('aojajon123hoo^^^^¨.45€€6````....7.8£££9|0££',separator).string,
+						'0.1234567890',
+						'No integer part');
+					equals($.ui.diginput.format('ajajn?123h^^^^¨,45ooo€€6````....7.8£££9|0££',separator).string,
+						'12345.67890');
+			    });
+				test("Mixed test",8,function()
 			    {
-					expect(8);
 					equals($.ui.diginput.format(100.00,{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
 						'100'); // en js 100.00 = 100
 					equals($.ui.diginput.format('100|00',{spacing:'_', floatSep:'|',floatFix:'|o'}).string,
